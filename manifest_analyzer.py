@@ -26,9 +26,7 @@ tree = ""
 root = ""
 app = ""
 namespace = "http://schemas.android.com/apk/res/android"
-
-# root tag -> manifest
-# root attr -> xmlns
+list_total_exp_activities = []
 
 console = Console()
 
@@ -99,7 +97,6 @@ def main():
     print_KeyValue(key= " app name", value= app_name + "\n", symbol= label_symbol)
 
     show_main_menu(app)
-
 #=============== Main End ===============
 
 #=============== Show Main Menu Starts ===============
@@ -108,11 +105,11 @@ def show_main_menu(app):
         console.print(f"\n{hamburger_symbol} Main Menu \n", style="bold green")
         console.print("[1] Show All Activities", style="cyan", markup= False)
         console.print("[2] Show Exported Activities", style="cyan", markup= False)
-        console.print("[3] Show Broadcast Receivers", style="cyan", markup= False)
+        console.print("[3] Show All Broadcast Receivers", style="cyan", markup= False)
         console.print("[4] Show Exported Broadcast Receivers", style="cyan", markup= False)
-        console.print("[5] Show Content Providers", style="cyan", markup= False)
+        console.print("[5] Show All Content Providers", style="cyan", markup= False)
         console.print("[6] Show Exported Content Providers", style="cyan", markup= False)
-        console.print("[7] Show Services", style="cyan", markup= False)
+        console.print("[7] Show All Services", style="cyan", markup= False)
         console.print("[8] Show Exported Services", style="cyan", markup= False)
         console.print("[0] Exit \n", style="bold red")
 
@@ -136,9 +133,14 @@ def show_exported_activities(app):
     activities = app.findall("activity")
     console.print(f"\n{attention_symbol} Exported Activities\n", style='green')
 
+    total_exported_activities = 0
+
     for activity in activities:
         if activity.get(f"{{{namespace}}}exported") == "true":
+            total_exported_activities += 1
             console.print(f"{page_symbol} {activity.get(f"{{{namespace}}}name")}", style='blue')
+
+    console.print(f"Total no. of Exported Activities: {total_exported_activities}", style='green blink')
 
     show_exported_activity_menu(app)
 #=============== Show Exported Activities End =============== 
@@ -150,23 +152,53 @@ def show_exported_activity_menu(app):
         console.print("[1] Show Intent Filters", style="cyan", markup= False)
         console.print("[0] Go Back\n", style="cyan", markup= False)
         choice = input("Please select a field: ").strip()
+        print("\n")
 
         if choice == "0":
             show_main_menu(app)
             break
+        elif choice == "1":
+            choose_exp_activity_for_intent(app)
+            break
         else:
-            show_intent_filters(app)
-
+            console.print("Invalid Choice. Try Again!", style="bold red")
 #=============== Show Exported Activities Menu End =============== 
 
-#=============== Show Exported Activities Start ===============  
-def show_intent_filters(app):
+#=============== Choose Exported Activity for intent filter Menu Start =============== 
+def choose_exp_activity_for_intent(app):
     # find exported activities in applications
     activities = app.findall("activity")
-    console.print(f"\n{attention_symbol} Exported Activities", style='green')
+    total_exp_activities = 0
 
     for activity in activities:
         if activity.get(f"{{{namespace}}}exported") == "true":
+            activity_name = activity.get(f"{{{namespace}}}name")
+            list_total_exp_activities.append(activity_name)
+            total_exp_activities += 1
+            console.print(f"[{total_exp_activities}] {activity_name}", style='blue')
+
+    while True:
+        console.print(f"\n{hamburger_symbol} Select Activity \n", style="bold green")
+        console.print("[0] Go Back\n", style="cyan", markup= False)
+
+        choice = input("Please select a field: ").strip()
+
+        if choice == "0":
+            show_exported_activities(app)
+            break
+        elif int(choice) > len(list_total_exp_activities) or int(choice) < 1:
+            console.print("Invalid Choice. Try Again!", style="bold red")
+        else:
+            show_intent_filters(app, list_total_exp_activities[int(choice) - 1])
+#=============== Choose Exported Activity for intent filter Menu End =============== 
+
+#=============== Show Intent Filters Start ===============  
+def show_intent_filters(app, activity_name):
+    # find exported activities in applications
+    activities = app.findall("activity")
+
+    for activity in activities:
+        if activity.get(f"{{{namespace}}}name") == activity_name:
             console.print(f"\n{page_symbol} {activity.get(f"{{{namespace}}}name")}", style='blue')
 
             # find all intent filters
@@ -223,7 +255,7 @@ def show_intent_filters(app):
                     table.add_row(aNames[i], cNames[i], dNames[i])
 
                 console.print(table)
-#=============== Show Exported Activities End ===============
+#=============== Show Intent Filters End ===============
 
 #=============== Show All Activities Start ===============
 def show_all_activities(app):
