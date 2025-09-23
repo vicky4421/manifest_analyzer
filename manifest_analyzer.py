@@ -1,14 +1,14 @@
 from rich.console import Console
-from rich.table import Table
-from time import sleep
 import sys
 import os
 import xml.etree.ElementTree as ET
 import pyfiglet
+import utils as u
 
 version = "1.0.0"
 
 xmlFile = ""
+namespace = "http://schemas.android.com/apk/res/android"
 
 # symbols
 x_symbol = ":x:"
@@ -22,37 +22,16 @@ hamburger_symbol = ":hamburger:"
 pri_color = "magenta"
 sec_color = "cyan"
 
-tree = ""
-root = ""
-app = ""
-namespace = "http://schemas.android.com/apk/res/android"
-list_total_exp_activities = []
-
 console = Console()
-
-# Banner
-banner_font = pyfiglet.Figlet(font="slant", width=90)
-console.print(f"{banner_font.renderText("Manifest Analyzer")}", style=pri_color)
-console.print(f"- By Vivek Sawant, Version: {version}")
-
-# function for printing key value in uniform color
-def print_KeyValue(
-        key: str,
-        value: str,
-        symbol: str,
-        extra_style = "",
-        key_style = "bold magenta",
-        value_style = "cyan",
-):
-    # style_prefix = f"[{extra_style}]" if extra_style else ""
-    # style_suffix = f"[/{extra_style}]" if extra_style else ""
-    console.print(
-        f"{symbol} [{key_style}]{key}:[/{key_style}] [{value_style}]{value}[/{value_style}]",
-        style=extra_style
-    )
 
 #=============== Main Start ===============
 def main():
+
+    # Banner
+    banner_font = pyfiglet.Figlet(font="slant", width=90)
+    console.print(f"{banner_font.renderText("Manifest Analyzer")}", style=pri_color)
+    console.print(f"- By Vivek Sawant, Version: {version}")
+
     # import file from cli 
     if len(sys.argv) == 2:
         xmlFile = sys.argv[1]
@@ -69,14 +48,14 @@ def main():
 
         # parse file
         else:
-            print_KeyValue(key="Parsing file", value=xmlFile, symbol="\n\n" + check_symbol)
+            u.print_KeyValue(key="Parsing file", value=xmlFile, symbol="\n\n" + check_symbol)
             with console.status("Parsing file...", spinner="clock"):
                 try:
                     tree = ET.parse(xmlFile)
                     root = tree.getroot()
 
                     if root.get("package") and root.tag == "manifest":
-                        print_KeyValue(key= " Package name", value= root.get("package"), symbol= label_symbol, extra_style="blink")
+                        u.print_KeyValue(key= " Package name", value= root.get("package"), symbol= label_symbol, extra_style="blink")
                             
                     else:
                         console.print(f"{x_symbol} This is not an Android Manifest file!", style="red")
@@ -94,7 +73,7 @@ def main():
     # Find application tag
     app = root.find('application')
     app_name = app.get(f"{{{namespace}}}name")
-    print_KeyValue(key= " app name", value= app_name + "\n", symbol= label_symbol)
+    u.print_KeyValue(key= " app name", value= app_name + "\n", symbol= label_symbol)
 
     show_main_menu(app)
 #=============== Main End ===============
@@ -102,7 +81,7 @@ def main():
 #=============== Show Main Menu Starts ===============
 def show_main_menu(app):
     while True:
-        console.print(f"\n{hamburger_symbol} Main Menu \n", style="bold green")
+        console.print(f"\n{hamburger_symbol} Main Menu", style="bold green")
         console.print("[1] Show All Activities", style="cyan", markup= False)
         console.print("[2] Show Exported Activities", style="cyan", markup= False)
         console.print("[3] Show All Broadcast Receivers", style="cyan", markup= False)
@@ -119,154 +98,27 @@ def show_main_menu(app):
             console.print("Exiting...", style="bold red")
             break
         elif choice == "1":
-            show_all_activities(app)
+            u.show_all_items(app, 'activity')
         elif choice == "2":
-            show_exported_activities(app)
+            u.show_exported_items(app, 'activity')
+            break
+        elif choice == "3":
+            u.show_all_items(app, 'receiver')
+        elif choice == "4":
+            u.show_exported_items(app, 'receiver')
+            break
+        elif choice == "5":
+            u.show_all_items(app, 'provider')
+        elif choice == "6":
+            u.show_exported_items(app, 'provider')
+            break
+        elif choice == "7":
+            u.show_all_items(app, 'service')
+        elif choice == "8":
+            u.show_exported_items(app, 'service')
             break
         else:
             console.print("Invalid Choice. Try Again!", style="bold red")
-#=============== Show Main Menu End ===============
-
-#=============== Show Exported Activities Start ===============
-def show_exported_activities(app):
-    # find exported activities in applications
-    activities = app.findall("activity")
-    console.print(f"\n{attention_symbol} Exported Activities\n", style='green')
-
-    total_exported_activities = 0
-
-    for activity in activities:
-        if activity.get(f"{{{namespace}}}exported") == "true":
-            total_exported_activities += 1
-            console.print(f"{page_symbol} {activity.get(f"{{{namespace}}}name")}", style='blue')
-
-    console.print(f"Total no. of Exported Activities: {total_exported_activities}", style='green blink')
-
-    show_exported_activity_menu(app)
-#=============== Show Exported Activities End =============== 
-
-#=============== Show Exported Activities Menu Start =============== 
-def show_exported_activity_menu(app):
-    while True:
-        console.print(f"\n{hamburger_symbol} Exported Activities Menu \n", style="bold green")
-        console.print("[1] Show Intent Filters", style="cyan", markup= False)
-        console.print("[0] Go Back\n", style="cyan", markup= False)
-        choice = input("Please select a field: ").strip()
-        print("\n")
-
-        if choice == "0":
-            show_main_menu(app)
-            break
-        elif choice == "1":
-            choose_exp_activity_for_intent(app)
-            break
-        else:
-            console.print("Invalid Choice. Try Again!", style="bold red")
-#=============== Show Exported Activities Menu End =============== 
-
-#=============== Choose Exported Activity for intent filter Menu Start =============== 
-def choose_exp_activity_for_intent(app):
-    # find exported activities in applications
-    activities = app.findall("activity")
-    total_exp_activities = 0
-
-    for activity in activities:
-        if activity.get(f"{{{namespace}}}exported") == "true":
-            activity_name = activity.get(f"{{{namespace}}}name")
-            list_total_exp_activities.append(activity_name)
-            total_exp_activities += 1
-            console.print(f"[{total_exp_activities}] {activity_name}", style='blue')
-
-    while True:
-        console.print(f"\n{hamburger_symbol} Select Activity \n", style="bold green")
-        console.print("[0] Go Back\n", style="cyan", markup= False)
-
-        choice = input("Please select a field: ").strip()
-
-        if choice == "0":
-            show_exported_activities(app)
-            break
-        elif int(choice) > len(list_total_exp_activities) or int(choice) < 1:
-            console.print("Invalid Choice. Try Again!", style="bold red")
-        else:
-            show_intent_filters(app, list_total_exp_activities[int(choice) - 1])
-#=============== Choose Exported Activity for intent filter Menu End =============== 
-
-#=============== Show Intent Filters Start ===============  
-def show_intent_filters(app, activity_name):
-    # find exported activities in applications
-    activities = app.findall("activity")
-
-    for activity in activities:
-        if activity.get(f"{{{namespace}}}name") == activity_name:
-            console.print(f"\n{page_symbol} {activity.get(f"{{{namespace}}}name")}", style='blue')
-
-            # find all intent filters
-            intent_filters = activity.findall("intent-filter")
-
-            console.print(f"\nNo. of intent filters for this activity: {len(intent_filters)}")
-
-            # find action-category-data for each intent filter
-            for intent_filter in intent_filters:
-
-                table = Table(show_header=True, header_style="bold magenta")
-                table.add_column("Action", justify="center")
-                table.add_column("Category", justify="center")
-                table.add_column("Data", justify="left")
-
-                actions = intent_filter.findall("action")
-                categories = intent_filter.findall("category")
-                data = intent_filter.findall("data")
-
-                aNames = []
-                cNames = []
-                dNames = []
-
-                for action in actions:
-                    aNames.append(action.get(f"{{{namespace}}}name"))
-
-                for category in categories:
-                    cNames.append(category.get(f"{{{namespace}}}name"))
-
-                for dt in data:
-                    if dt.get(f"{{{namespace}}}scheme"):
-                        dNames.append(f"scheme: {dt.get(f'{{{namespace}}}scheme')}")
-                    elif dt.get(f"{{{namespace}}}host"):
-                        dNames.append(f"host: {dt.get(f'{{{namespace}}}host')}")
-                    elif dt.get(f"{{{namespace}}}port"):
-                        dNames.append(f"port: {dt.get(f'{{{namespace}}}port')}")
-                    elif dt.get(f"{{{namespace}}}path"):
-                        dNames.append(f"path: {dt.get(f'{{{namespace}}}path')}")
-                    elif dt.get(f"{{{namespace}}}pathPrefix"):
-                        dNames.append(f"pathPrefix: {dt.get(f'{{{namespace}}}pathPrefix')}")
-                    elif dt.get(f"{{{namespace}}}pathPattern"):
-                        dNames.append(f"pathPattern: {dt.get(f'{{{namespace}}}pathPattern')}")
-                    elif dt.get(f"{{{namespace}}}mimeType"):
-                        dNames.append(f"mimeType: {dt.get(f'{{{namespace}}}mimeType')}")
-                              
-                # Normalize length
-                max_len = max(len(aNames), len(cNames), len(dNames))
-                aNames += [""] * (max_len - len(aNames))
-                cNames += [""] * (max_len - len(cNames))
-                dNames += [""] * (max_len - len(dNames))
-               
-
-                for i in range(max_len):
-                    table.add_row(aNames[i], cNames[i], dNames[i])
-
-                console.print(table)
-#=============== Show Intent Filters End ===============
-
-#=============== Show All Activities Start ===============
-def show_all_activities(app):
-    # find exported activities in applications
-    activities = app.findall("activity")
-    console.print(f"\n{attention_symbol} All Activities", style='green')
-    console.print(f"Total no. of Activities: {len(activities)}", style='green blink')
-
-    for activity in activities:
-        console.print(f"{page_symbol} {activity.get(f"{{{namespace}}}name")}", style='blue')
-#=============== Show All Activities End ===============
 
 if __name__ == "__main__":
     main()
