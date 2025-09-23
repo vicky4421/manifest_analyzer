@@ -4,8 +4,9 @@ from time import sleep
 import sys
 import os
 import xml.etree.ElementTree as ET
+import pyfiglet
 
-console = Console()
+version = "1.0.0"
 
 xmlFile = ""
 x_symbol = ":x:"
@@ -13,6 +14,10 @@ check_symbol = ":white_check_mark:"
 page_symbol = ":page_with_curl:"
 label_symbol = ":label:"
 attention_symbol = ":zap:"
+
+# colors
+pri_color = "magenta"
+sec_color = "cyan"
 
 tree = ""
 root = ""
@@ -22,6 +27,14 @@ namespace = "http://schemas.android.com/apk/res/android"
 # root tag -> manifest
 # root attr -> xmlns
 
+console = Console()
+
+# Banner
+banner_font = pyfiglet.Figlet(font="slant", width=90)
+console.print(f"{banner_font.renderText("Manifest Analyzer")}", style=pri_color)
+console.print(f"- By Vivek Sawant, Version: {version}")
+
+# function for printing key value in uniform color
 def print_KeyValue(
         key: str,
         value: str,
@@ -55,7 +68,7 @@ def main():
 
         # parse file
         else:
-            print_KeyValue(key="Parsing file", value=xmlFile, symbol="\n" + check_symbol)
+            print_KeyValue(key="Parsing file", value=xmlFile, symbol="\n\n" + check_symbol)
             with console.status("Parsing file...", spinner="clock"):
                 try:
                     tree = ET.parse(xmlFile)
