@@ -9,11 +9,14 @@ import pyfiglet
 version = "1.0.0"
 
 xmlFile = ""
+
+# symbols
 x_symbol = ":x:"
 check_symbol = ":white_check_mark:"
 page_symbol = ":page_with_curl:"
 label_symbol = ":label:"
 attention_symbol = ":zap:"
+hamburger_symbol = ":hamburger:"
 
 # colors
 pri_color = "magenta"
@@ -95,8 +98,14 @@ def main():
     app_name = app.get(f"{{{namespace}}}name")
     print_KeyValue(key= " app name", value= app_name + "\n", symbol= label_symbol)
 
+    show_main_menu(app)
+
+#=============== Main End ===============
+
+#=============== Show Main Menu Starts ===============
+def show_main_menu(app):
     while True:
-        console.print("\nOptions \n", style="bold green")
+        console.print(f"\n{hamburger_symbol} Main Menu \n", style="bold green")
         console.print("[1] Show All Activities", style="cyan", markup= False)
         console.print("[2] Show Exported Activities", style="cyan", markup= False)
         console.print("[3] Show Broadcast Receivers", style="cyan", markup= False)
@@ -116,13 +125,42 @@ def main():
             show_all_activities(app)
         elif choice == "2":
             show_exported_activities(app)
+            break
         else:
             console.print("Invalid Choice. Try Again!", style="bold red")
+#=============== Show Main Menu End ===============
 
-#=============== Main End ===============
+#=============== Show Exported Activities Start ===============
+def show_exported_activities(app):
+    # find exported activities in applications
+    activities = app.findall("activity")
+    console.print(f"\n{attention_symbol} Exported Activities\n", style='green')
+
+    for activity in activities:
+        if activity.get(f"{{{namespace}}}exported") == "true":
+            console.print(f"{page_symbol} {activity.get(f"{{{namespace}}}name")}", style='blue')
+
+    show_exported_activity_menu(app)
+#=============== Show Exported Activities End =============== 
+
+#=============== Show Exported Activities Menu Start =============== 
+def show_exported_activity_menu(app):
+    while True:
+        console.print(f"\n{hamburger_symbol} Exported Activities Menu \n", style="bold green")
+        console.print("[1] Show Intent Filters", style="cyan", markup= False)
+        console.print("[0] Go Back\n", style="cyan", markup= False)
+        choice = input("Please select a field: ").strip()
+
+        if choice == "0":
+            show_main_menu(app)
+            break
+        else:
+            show_intent_filters(app)
+
+#=============== Show Exported Activities Menu End =============== 
 
 #=============== Show Exported Activities Start ===============  
-def show_exported_activities(app):
+def show_intent_filters(app):
     # find exported activities in applications
     activities = app.findall("activity")
     console.print(f"\n{attention_symbol} Exported Activities", style='green')
@@ -134,7 +172,7 @@ def show_exported_activities(app):
             # find all intent filters
             intent_filters = activity.findall("intent-filter")
 
-            console.print(f"No. of intent filters for this activity: {len(intent_filters)}")
+            console.print(f"\nNo. of intent filters for this activity: {len(intent_filters)}")
 
             # find action-category-data for each intent filter
             for intent_filter in intent_filters:
