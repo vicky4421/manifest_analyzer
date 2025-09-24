@@ -38,7 +38,28 @@ def show_all_items(app, item):
 
     for i in items:
         console.print(f"{page_symbol} {i.get(f"{{{namespace}}}name")}", style='blue')
-#=============== Show All Broadcast Receivers End ===============
+
+    show_item_menu(app, item)
+#=============== Show All Items End ===============
+
+#=============== Show Item Menu Start ===============
+def show_item_menu(app, item):
+    while True:
+        console.print(f"\n{hamburger_symbol} {item} Menu", style="bold green")
+        console.print(f"[1] Show Exported {item}", style="cyan", markup= False)
+        console.print("[0] Exit \n", style="bold red")
+
+        choice = input("Please select a field: ").strip()
+
+        if choice == "0":
+            ma.show_main_menu(app)
+            break
+        elif choice == "1":
+            show_exported_items(app, item)
+            break
+        else:
+            console.print("Invalid Choice. Try Again!", style="bold red")
+#=============== Show Item Menu End ===============
 
 #=============== Show All Exported Items Start ===============
 def show_exported_items(app, item):
@@ -77,8 +98,6 @@ def show_exported_item_menu(app, item):
         else:
             console.print("Invalid Choice. Try Again!", style="bold red")
 #=============== Show Exported Items Menu End ===============
-
-#=============== Show Main Menu End ===============
 
 #=============== Choose Exported Item for intent filter Menu Start =============== 
 def choose_exp_item_for_intent(app, item):

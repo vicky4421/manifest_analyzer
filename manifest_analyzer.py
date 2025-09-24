@@ -82,14 +82,10 @@ def main():
 def show_main_menu(app):
     while True:
         console.print(f"\n{hamburger_symbol} Main Menu", style="bold green")
-        console.print("[1] Show All Activities", style="cyan", markup= False)
-        console.print("[2] Show Exported Activities", style="cyan", markup= False)
-        console.print("[3] Show All Broadcast Receivers", style="cyan", markup= False)
-        console.print("[4] Show Exported Broadcast Receivers", style="cyan", markup= False)
-        console.print("[5] Show All Content Providers", style="cyan", markup= False)
-        console.print("[6] Show Exported Content Providers", style="cyan", markup= False)
-        console.print("[7] Show All Services", style="cyan", markup= False)
-        console.print("[8] Show Exported Services", style="cyan", markup= False)
+        console.print("[1] Show Activities", style="cyan", markup= False)
+        console.print("[2] Show Broadcast Receivers", style="cyan", markup= False)
+        console.print("[3] Show Content Providers", style="cyan", markup= False)
+        console.print("[4] Show Services", style="cyan", markup= False)
         console.print("[0] Exit \n", style="bold red")
 
         choice = input("Please select a field: ").strip()
@@ -99,23 +95,15 @@ def show_main_menu(app):
             break
         elif choice == "1":
             u.show_all_items(app, 'activity')
+            break
         elif choice == "2":
-            u.show_exported_items(app, 'activity')
+            u.show_all_items(app, 'receiver')
             break
         elif choice == "3":
-            u.show_all_items(app, 'receiver')
-        elif choice == "4":
-            u.show_exported_items(app, 'receiver')
-            break
-        elif choice == "5":
             u.show_all_items(app, 'provider')
-        elif choice == "6":
-            u.show_exported_items(app, 'provider')
             break
-        elif choice == "7":
+        elif choice == "4":
             u.show_all_items(app, 'service')
-        elif choice == "8":
-            u.show_exported_items(app, 'service')
             break
         else:
             console.print("Invalid Choice. Try Again!", style="bold red")
