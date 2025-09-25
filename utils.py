@@ -13,6 +13,10 @@ attention_symbol = ":zap:"
 hamburger_symbol = ":hamburger:"
 diamond_symbol = ":small_orange_diamond:"
 
+# colors
+pri_color = "magenta"
+sec_color = "cyan"
+
 namespace = "http://schemas.android.com/apk/res/android"
 
 # function for printing key value in uniform color
@@ -48,7 +52,6 @@ def show_item_menu(app, item):
     while True:
         console.print(f"\n{hamburger_symbol} {item} Menu", style="bold green")
         console.print(f"[1] Show Exported {item}", style="cyan", markup= False)
-        console.print(f"[2] Show {item} Attributes", style="cyan", markup= False)
         console.print("[0] Exit \n", style="bold red")
 
         choice = input("Please select a field: ").strip()
@@ -59,8 +62,6 @@ def show_item_menu(app, item):
         elif choice == "1":
             show_exported_items(app, item)
             break
-        elif choice == "2":
-            choose_item_for_attributes(app, item)
         else:
             console.print("Invalid Choice. Try Again!", style="bold red")
 #=============== Show Item Menu End ===============
@@ -88,6 +89,7 @@ def show_exported_item_menu(app, item):
     while True:
         console.print(f"\n{hamburger_symbol} Exported {item} Menu \n", style="bold green")
         console.print("[1] Show Intent Filters", style="cyan", markup= False)
+        console.print("[2] Show Attributes", style="cyan", markup= False)
         console.print("[0] Go Back\n", style="cyan", markup= False)
         choice = input("Please select a field: ").strip()
         print("\n")
@@ -98,6 +100,9 @@ def show_exported_item_menu(app, item):
         elif choice == "1":
             # choose_exp_activity_for_intent(app)
             choose_exp_item_for_intent(app, item)
+            break
+        elif choice == "2":
+            choose_item_for_attributes(app, item)
             break
         else:
             console.print("Invalid Choice. Try Again!", style="bold red")
@@ -131,6 +136,7 @@ def choose_exp_item_for_intent(app, item):
             console.print("Invalid Choice. Try Again!", style="bold red")
         else:
             show_intent_filters(app, list_total_exp_items[int(choice) - 1], item)
+            break
 #=============== Choose Exported Activity for intent filter Menu End =============== 
 
 #=============== Show Intent Filters Start ===============  
@@ -230,17 +236,34 @@ def choose_item_for_attributes(app, item):
         elif int(choice) > len(list_total_items) or int(choice) < 1:
             console.print("Invalid Choice. Try Again!", style="bold red")
         else:
-            # show_intent_filters(app, list_total_items[int(choice) - 1], item)
-            show_item_attr(app, item)
+            show_item_attr(app, list_total_items[int(choice) -1], item)
             break
 #=============== Choose Item Attributes Menu End ===============
 
 #=============== Show Item Attributes Start ===============
-def show_item_attr(app, item):
-    item = app.find(item)
-    nickname = item.get(f"{{{namespace}}}name").rsplit('.', 1)[-1]
-    console.print(f"\n{page_symbol} {nickname}", style='bold green')
-    for attr, value in item.items():
-        attr = attr.split('}', 1)[1]
-        print_KeyValue(key=attr, value=value, symbol=diamond_symbol)
+def show_item_attr(app, item_name, item):
+    items = app.findall(item)
+    for i in items:
+        if i.get(f"{{{namespace}}}name") == item_name:
+            nickname = item_name.rsplit('.', 1)[-1]
+            console.print(f"\n{page_symbol} {nickname}", style='bold green')
+            for attr, value in i.items():
+                attr = attr.split('}', 1)[1]
+                print_KeyValue(key=attr, value=value, symbol=diamond_symbol)
 #=============== Show App Attributes End ===============
+
+#=============== Show App Meta Data Start ===============
+def show_app_metadata(app):
+    count = 0
+    list_metadata = app.findall('meta-data')
+    for md in list_metadata:
+        for value in md.items():
+            value = value[1]
+            if count == 0:
+                console.print(f"{diamond_symbol} {value}: ", style=f"bold {pri_color}", end="")
+                count += 1
+                continue
+            if count == 1:
+                console.print(f"{value}", style=sec_color)
+                count = 0
+#=============== Show App Meta Data End ===============

@@ -59,6 +59,9 @@ def main():
                     print("\n")
                     console.print(f"{attention_symbol} App Attributes", style='bold green')
                     u.show_app_attr(app)
+                    print("\n")
+                    console.print(f"{attention_symbol} App Metadata", style='bold green')
+                    u.show_app_metadata(app)
                         
                 else:
                     console.print(f"{x_symbol} This is not an Android Manifest file!", style="red")
