@@ -11,6 +11,7 @@ page_symbol = ":page_with_curl:"
 label_symbol = ":label:"
 attention_symbol = ":zap:"
 hamburger_symbol = ":hamburger:"
+diamond_symbol = ":small_orange_diamond:"
 
 namespace = "http://schemas.android.com/apk/res/android"
 
@@ -47,6 +48,7 @@ def show_item_menu(app, item):
     while True:
         console.print(f"\n{hamburger_symbol} {item} Menu", style="bold green")
         console.print(f"[1] Show Exported {item}", style="cyan", markup= False)
+        console.print(f"[2] Show {item} Attributes", style="cyan", markup= False)
         console.print("[0] Exit \n", style="bold red")
 
         choice = input("Please select a field: ").strip()
@@ -57,6 +59,8 @@ def show_item_menu(app, item):
         elif choice == "1":
             show_exported_items(app, item)
             break
+        elif choice == "2":
+            choose_item_for_attributes(app, item)
         else:
             console.print("Invalid Choice. Try Again!", style="bold red")
 #=============== Show Item Menu End ===============
@@ -192,3 +196,51 @@ def show_intent_filters(app, item_name, item):
 
                 console.print(table)
 #=============== Show Intent Filters End ===============
+
+#=============== Show App Attributes Start ===============
+def show_app_attr(app):
+    for attr, value in app.items():
+        attr = attr.split('}', 1)[1]
+        print_KeyValue(key=attr, value=value, symbol=diamond_symbol)
+#=============== Show App Attributes End ===============
+
+#=============== Choose Item Attributes Menu Start ===============
+def choose_item_for_attributes(app, item):
+
+    list_total_items = []
+
+    items = app.findall(item)
+    total_items = 0
+
+    for i in items:
+        item_name = i.get(f"{{{namespace}}}name")
+        list_total_items.append(item_name)
+        total_items += 1
+        console.print(f"[{total_items}] {item_name}", style='blue')
+
+    while True:
+        console.print(f"\n{hamburger_symbol} Select {item} \n", style="bold green")
+        console.print("[0] Go Back\n", style="cyan", markup= False)
+
+        choice = input("Please select a field: ").strip()
+
+        if choice == "0":
+            show_exported_items(app, item)
+            break
+        elif int(choice) > len(list_total_items) or int(choice) < 1:
+            console.print("Invalid Choice. Try Again!", style="bold red")
+        else:
+            # show_intent_filters(app, list_total_items[int(choice) - 1], item)
+            show_item_attr(app, item)
+            break
+#=============== Choose Item Attributes Menu End ===============
+
+#=============== Show Item Attributes Start ===============
+def show_item_attr(app, item):
+    item = app.find(item)
+    nickname = item.get(f"{{{namespace}}}name").rsplit('.', 1)[-1]
+    console.print(f"\n{page_symbol} {nickname}", style='bold green')
+    for attr, value in item.items():
+        attr = attr.split('}', 1)[1]
+        print_KeyValue(key=attr, value=value, symbol=diamond_symbol)
+#=============== Show App Attributes End ===============

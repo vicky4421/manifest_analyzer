@@ -49,31 +49,28 @@ def main():
         # parse file
         else:
             u.print_KeyValue(key="Parsing file", value=xmlFile, symbol="\n\n" + check_symbol)
-            with console.status("Parsing file...", spinner="clock"):
-                try:
-                    tree = ET.parse(xmlFile)
-                    root = tree.getroot()
 
-                    if root.get("package") and root.tag == "manifest":
-                        u.print_KeyValue(key= " Package name", value= root.get("package"), symbol= label_symbol, extra_style="blink")
-                            
-                    else:
-                        console.print(f"{x_symbol} This is not an Android Manifest file!", style="red")
-                        return
-
-                except Exception as e:
-                    console.print(f"{x_symbol} {e}")
+            try:
+                tree = ET.parse(xmlFile)
+                root = tree.getroot()
+                app = root.find('application')
+                if root.get("package") and root.tag == "manifest":
+                    u.print_KeyValue(key= " Package name", value= root.get("package"), symbol= label_symbol, extra_style="blink")
+                    print("\n")
+                    console.print(f"{attention_symbol} App Attributes", style='bold green')
+                    u.show_app_attr(app)
+                        
+                else:
+                    console.print(f"{x_symbol} This is not an Android Manifest file!", style="red")
                     return
+            except Exception as e:
+                console.print(f"{x_symbol} {e}")
+                return
             
     else:
         console.print(f"{x_symbol} Incorrect usage", style="red")
         console.print(f"{check_symbol} Usage: python manifest_analyzer.py [file name]", style='green', markup=False)
         return
-    
-    # Find application tag
-    app = root.find('application')
-    app_name = app.get(f"{{{namespace}}}name")
-    u.print_KeyValue(key= " app name", value= app_name + "\n", symbol= label_symbol)
 
     show_main_menu(app)
 #=============== Main End ===============
