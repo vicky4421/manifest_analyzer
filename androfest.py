@@ -92,6 +92,7 @@ def show_main_menu(app, root):
         console.print("[3] Show Content Providers", style="cyan", markup= False)
         console.print("[4] Show Services", style="cyan", markup= False)
         console.print("[5] Show Permissions", style="cyan", markup= False)
+        console.print("[6] Show Queries", style="cyan", markup= False)
         console.print("[0] Exit \n", style="bold red")
 
         choice = input("Please select a field: ").strip()
@@ -100,20 +101,22 @@ def show_main_menu(app, root):
             console.print("Exiting...", style="bold red")
             break
         elif choice == "1":
-            u.show_all_items(app, 'activity')
+            u.show_all_items(app, 'activity', root)
             break
         elif choice == "2":
-            u.show_all_items(app, 'receiver')
+            u.show_all_items(app, 'receiver', root)
             break
         elif choice == "3":
-            u.show_all_items(app, 'provider')
+            u.show_all_items(app, 'provider', root)
             break
         elif choice == "4":
-            u.show_all_items(app, 'service')
+            u.show_all_items(app, 'service', root)
             break
         elif choice == "5":
             u.show_permissions(root)
             break
+        elif choice == "6":
+            u.show_queries(root)
         else:
             console.print("Invalid Choice. Try Again!", style="bold red")
 

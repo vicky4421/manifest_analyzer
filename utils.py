@@ -73,7 +73,7 @@ dangerous_perm_list = [
 ]
 
 #=============== Show All Items Start ===============
-def show_all_items(app, item):
+def show_all_items(app, item, root):
     items = app.findall(item)
     console.print(f"\n{attention_symbol} All {item}", style='green')
     console.print(f"Total no. of {item}: {len(items)}", style='green blink')
@@ -81,7 +81,15 @@ def show_all_items(app, item):
     for i in items:
         console.print(f"{page_symbol} {i.get(f"{{{namespace}}}name")}", style='blue')
 
-    show_item_menu(app, item)
+        meta_list = i.findall('meta-data')
+        for md in meta_list:
+            md_name = md.get(f"{{{namespace}}}name")
+            md_value = md.get(f"{{{namespace}}}value")
+            # If value is a resource reference, you could also handle android:resource
+            print('    ', end='')
+            print_KeyValue(md_name, md_value, label_symbol)
+
+    show_item_menu(app, item, root)
 #=============== Show All Items End ===============
 
 #=============== Show Item Menu Start ===============
@@ -125,7 +133,7 @@ def show_exported_items(app, item):
 #=============== Show All Exported Items End ===============
 
 #=============== Show Exported Items Menu Start ===============
-def show_exported_item_menu(app, item):
+def show_exported_item_menu(app, item, root):
     while True:
         console.print(f"\n{hamburger_symbol} Exported {item} Menu \n", style="bold green")
         console.print("[1] Show Intent Filters", style="cyan", markup= False)
@@ -135,7 +143,7 @@ def show_exported_item_menu(app, item):
         print("\n")
 
         if choice == "0":
-            ma.show_main_menu(app)
+            ma.show_main_menu(app, root)
             break
         elif choice == "1":
             # choose_exp_activity_for_intent(app)
@@ -321,7 +329,7 @@ def show_manifest_attr(root):
 
 #=============== Show Permissions Start ===============
 def show_permissions(root):
-    console.print(f"{diamond_symbol} Permissions", style='bold green')
+    console.print(f"\n{diamond_symbol} Permissions", style='bold green')
     perms = root.findall('uses-permission')
     cust_perms = root.findall('permission')
     cust_perm_names = {p.get(f"{{{namespace}}}name") for p in cust_perms}
@@ -348,3 +356,40 @@ def show_permissions(root):
         console.print(f"{symbol} {name} [{protection}]", style=style, markup=False)
         
 #=============== Show Permissions End ===============
+
+#=============== Show Queries Start ===============
+def show_queries(root):
+    queries = root.find('queries')
+    if queries is None:
+        return
+
+    console.print(f"\n{diamond_symbol} Queries", style='bold green')
+
+    for child in queries:
+        if child.tag == 'intent':
+            action = child.find('action')
+            data = child.find('data')
+            category = child.find('category')
+
+            parts = []
+            if action is not None:
+                parts.append(f"[{pri_color}]action:[/{pri_color}] [{sec_color}]{action.get(f'{{{namespace}}}name')}[/{sec_color}]")
+            if data is not None:
+                for attr in ['scheme', 'mimeType', 'path']:
+                    val = data.get(f'{{{namespace}}}{attr}')
+                    if val:
+                        parts.append(f"[{pri_color}]{attr}:[/{pri_color}] [{sec_color}]{val}[/{sec_color}]")
+            if category is not None:
+                parts.append(f"[{pri_color}]category:[/{pri_color}] [{sec_color}]{category.get(f'{{{namespace}}}name')}[/{sec_color}]")
+
+            console.print(f":arrow_right:  [{pri_color}]Intent[/{pri_color}] -> {', '.join(parts)}")
+
+        elif child.tag == 'package':
+            name = child.get(f"{{{namespace}}}name")
+            console.print(f":package: [{pri_color}]Package[/{pri_color}] -> [{sec_color}]{name}[/{sec_color}]")
+
+        elif child.tag == 'provider':
+            authorities = child.get(f"{{{namespace}}}authorities")
+            console.print(f":link: [{pri_color}]Provider[/{pri_color}] -> [{pri_color}]authorities:[/{pri_color}] [{sec_color}]{authorities}[/{sec_color}]")
+#=============== Show Queries End ===============
+
