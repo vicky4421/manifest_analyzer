@@ -97,7 +97,7 @@ def show_item_menu(app, item, root):
     while True:
         console.print(f"\n{hamburger_symbol} {item} Menu", style="bold green")
         console.print(f"[1] Show Exported {item}", style="cyan", markup= False)
-        console.print("[0] Exit \n", style="bold red")
+        console.print("[0] Back \n", style="bold red")
 
         choice = input("Please select a field: ").strip()
 
@@ -105,17 +105,14 @@ def show_item_menu(app, item, root):
             ma.show_main_menu(app, root)
             break
         elif choice == "1":
-            show_exported_items(app, item)
-            break
-        elif choice == "2":
-            show_item_attr(app, item)
+            show_exported_items(app, item, root)
             break
         else:
             console.print("Invalid Choice. Try Again!", style="bold red")
 #=============== Show Item Menu End ===============
 
 #=============== Show All Exported Items Start ===============
-def show_exported_items(app, item):
+def show_exported_items(app, item, root):
     # find exported activities in applications
     items = app.findall(item)
     console.print(f"\n{attention_symbol} Exported {item}\n", style='green')
@@ -129,13 +126,13 @@ def show_exported_items(app, item):
 
     console.print(f"Total no. of Exported {item}: {total_exported_items}", style='green blink')
 
-    show_exported_item_menu(app, item)
+    show_exported_item_menu(app, item, root)
 #=============== Show All Exported Items End ===============
 
 #=============== Show Exported Items Menu Start ===============
 def show_exported_item_menu(app, item, root):
     while True:
-        console.print(f"\n{hamburger_symbol} Exported {item} Menu \n", style="bold green")
+        console.print(f"\n{hamburger_symbol} Exported {item} Menu", style="bold green")
         console.print("[1] Show Intent Filters", style="cyan", markup= False)
         console.print("[2] Show Attributes", style="cyan", markup= False)
         console.print("[0] Go Back\n", style="cyan", markup= False)
@@ -143,21 +140,20 @@ def show_exported_item_menu(app, item, root):
         print("\n")
 
         if choice == "0":
-            ma.show_main_menu(app, root)
+            show_item_menu(app, item, root)
             break
         elif choice == "1":
-            # choose_exp_activity_for_intent(app)
-            choose_exp_item_for_intent(app, item)
+            choose_exp_item_for_intent(app, item, root)
             break
         elif choice == "2":
-            choose_item_for_attributes(app, item)
+            choose_item_for_attributes(app, item, root)
             break
         else:
             console.print("Invalid Choice. Try Again!", style="bold red")
 #=============== Show Exported Items Menu End ===============
 
 #=============== Choose Exported Item for intent filter Menu Start =============== 
-def choose_exp_item_for_intent(app, item):
+def choose_exp_item_for_intent(app, item, root):
 
     list_total_exp_items = []
 
@@ -178,13 +174,14 @@ def choose_exp_item_for_intent(app, item):
         choice = input("Please select a field: ").strip()
 
         if choice == "0":
-            show_exported_items(app, item)
+            show_exported_items(app, item, root)
             break
         elif int(choice) > len(list_total_exp_items) or int(choice) < 1:
             console.print("Invalid Choice. Try Again!", style="bold red")
         else:
             show_intent_filters(app, list_total_exp_items[int(choice) - 1], item)
-            show_item_menu(app, item)
+            # show_item_menu(app, item, root)
+            show_exported_item_menu(app, item, root)
             break
 #=============== Choose Exported Activity for intent filter Menu End =============== 
 
@@ -260,7 +257,7 @@ def show_app_attr(app):
 #=============== Show App Attributes End ===============
 
 #=============== Choose Item Attributes Menu Start ===============
-def choose_item_for_attributes(app, item):
+def choose_item_for_attributes(app, item, root):
 
     list_total_items = []
 
@@ -280,13 +277,13 @@ def choose_item_for_attributes(app, item):
         choice = input("Please select a field: ").strip()
 
         if choice == "0":
-            show_exported_items(app, item)
+            show_exported_items(app, item, root)
             break
         elif int(choice) > len(list_total_items) or int(choice) < 1:
             console.print("Invalid Choice. Try Again!", style="bold red")
         else:
             show_item_attr(app, list_total_items[int(choice) -1], item)
-            show_item_menu(app, item)
+            show_item_menu(app, item, root)
             break
 #=============== Choose Item Attributes Menu End ===============
 

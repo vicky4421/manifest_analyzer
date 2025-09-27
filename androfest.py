@@ -4,6 +4,7 @@ import os
 import xml.etree.ElementTree as ET
 import pyfiglet
 import utils as u
+import time
 
 version = "1.0.0"
 
@@ -98,7 +99,9 @@ def show_main_menu(app, root):
         choice = input("Please select a field: ").strip()
 
         if choice == "0":
-            console.print("Exiting...", style="bold red")
+            # console.print("Exiting...", style="bold red")
+            with console.status("[bold red]Exiting...[/]", spinner= 'clock'):
+                time.sleep(1)
             break
         elif choice == "1":
             u.show_all_items(app, 'activity', root)
