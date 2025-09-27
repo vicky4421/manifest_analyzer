@@ -12,6 +12,9 @@ label_symbol = ":label:"
 attention_symbol = ":zap:"
 hamburger_symbol = ":hamburger:"
 diamond_symbol = ":small_orange_diamond:"
+skull_symbol = ":skull:"
+lock_symbol = ":lock:"
+green_cirle_symbol = ":green_circle:"
 
 # colors
 pri_color = "magenta"
@@ -35,6 +38,40 @@ def print_KeyValue(
         style=extra_style
     )
 
+dangerous_perm_list = [
+    "READ_CALENDAR",
+    "WRITE_CALENDAR",
+    "CAMERA",
+    "READ_CONTACTS",
+    "WRITE_CONTACTS",
+    "GET_ACCOUNTS",
+    "ACCESS_FINE_LOCATION",
+    "ACCESS_COARSE_LOCATION",
+    "RECORD_AUDIO",
+    "READ_PHONE_STATE",
+    "READ_PHONE_NUMBERS ",
+    "CALL_PHONE",
+    "ANSWER_PHONE_CALLS ",
+    "READ_CALL_LOG",
+    "WRITE_CALL_LOG",
+    "ADD_VOICEMAIL",
+    "USE_SIP",
+    "PROCESS_OUTGOING_CALLS",
+    "BODY_SENSORS",
+    "SEND_SMS",
+    "RECEIVE_SMS",
+    "READ_SMS",
+    "RECEIVE_WAP_PUSH",
+    "RECEIVE_MMS",
+    "READ_EXTERNAL_STORAGE",
+    "WRITE_EXTERNAL_STORAGE",
+    "ACCESS_MEDIA_LOCATION",
+    "ACCEPT_HANDOVER",
+    "ACCESS_BACKGROUND_LOCATION",
+    "ACTIVITY_RECOGNITION",
+    "BODY_SENSORS_BACKGROUND"
+]
+
 #=============== Show All Items Start ===============
 def show_all_items(app, item):
     items = app.findall(item)
@@ -48,7 +85,7 @@ def show_all_items(app, item):
 #=============== Show All Items End ===============
 
 #=============== Show Item Menu Start ===============
-def show_item_menu(app, item):
+def show_item_menu(app, item, root):
     while True:
         console.print(f"\n{hamburger_symbol} {item} Menu", style="bold green")
         console.print(f"[1] Show Exported {item}", style="cyan", markup= False)
@@ -57,7 +94,7 @@ def show_item_menu(app, item):
         choice = input("Please select a field: ").strip()
 
         if choice == "0":
-            ma.show_main_menu(app)
+            ma.show_main_menu(app, root)
             break
         elif choice == "1":
             show_exported_items(app, item)
@@ -281,3 +318,33 @@ def show_manifest_attr(root):
         print_KeyValue(key=attr, value=value, symbol=diamond_symbol)
     print('\n')
 #=============== Show Manifest Attributres End ===============
+
+#=============== Show Permissions Start ===============
+def show_permissions(root):
+    console.print(f"{diamond_symbol} Permissions", style='bold green')
+    perms = root.findall('uses-permission')
+    cust_perms = root.findall('permission')
+    cust_perm_names = {p.get(f"{{{namespace}}}name") for p in cust_perms}
+
+    for perm in perms:
+
+        name = perm.get(f"{{{namespace}}}name")
+
+        if name in cust_perm_names:
+            continue
+
+        isDangerous = name.rsplit('.', 1)[-1] in dangerous_perm_list
+
+        style = 'bold red' if isDangerous else pri_color
+        symbol = skull_symbol if isDangerous else green_cirle_symbol
+
+        console.print(f"{symbol} {name}", style=style)
+    
+    console.print(f"{diamond_symbol} Custom Permissions", style='bold green')
+    for perm in cust_perms:
+        name = perm.get(f"{{{namespace}}}name")
+        protection = perm.get(f"{{{namespace}}}protectionLevel")
+        symbol = lock_symbol if protection == 'signature' else green_cirle_symbol
+        console.print(f"{symbol} {name} [{protection}]", style=style, markup=False)
+        
+#=============== Show Permissions End ===============

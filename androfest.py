@@ -80,17 +80,18 @@ def main():
         console.print(f"{check_symbol} Usage: python manifest_analyzer.py [file name]", style='green', markup=False)
         return
 
-    show_main_menu(app)
+    show_main_menu(app, root)
 #=============== Main End ===============
 
 #=============== Show Main Menu Starts ===============
-def show_main_menu(app):
+def show_main_menu(app, root):
     while True:
         console.print(f"\n{hamburger_symbol} Main Menu", style="bold green")
         console.print("[1] Show Activities", style="cyan", markup= False)
         console.print("[2] Show Broadcast Receivers", style="cyan", markup= False)
         console.print("[3] Show Content Providers", style="cyan", markup= False)
         console.print("[4] Show Services", style="cyan", markup= False)
+        console.print("[5] Show Permissions", style="cyan", markup= False)
         console.print("[0] Exit \n", style="bold red")
 
         choice = input("Please select a field: ").strip()
@@ -109,6 +110,9 @@ def show_main_menu(app):
             break
         elif choice == "4":
             u.show_all_items(app, 'service')
+            break
+        elif choice == "5":
+            u.show_permissions(root)
             break
         else:
             console.print("Invalid Choice. Try Again!", style="bold red")
