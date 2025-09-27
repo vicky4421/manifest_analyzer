@@ -29,7 +29,7 @@ def main():
 
     # Banner
     banner_font = pyfiglet.Figlet(font="slant", width=90)
-    console.print(f"{banner_font.renderText("Manifest Analyzer")}", style=pri_color)
+    console.print(f"{banner_font.renderText("AndroFest")}", style=pri_color)
     console.print(f"- By Vivek Sawant, Version: {version}")
 
     # import file from cli 
@@ -55,8 +55,13 @@ def main():
                 root = tree.getroot()
                 app = root.find('application')
                 if root.get("package") and root.tag == "manifest":
+
                     u.print_KeyValue(key= " Package name", value= root.get("package"), symbol= label_symbol, extra_style="blink")
                     print("\n")
+
+                    console.print(f"{attention_symbol} Manifest Attributes", style='bold green')
+                    u.show_manifest_attr(root)
+
                     console.print(f"{attention_symbol} App Attributes", style='bold green')
                     u.show_app_attr(app)
                     print("\n")

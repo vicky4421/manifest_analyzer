@@ -1,6 +1,6 @@
 from rich.console import Console
 from rich.table import Table
-import manifest_analyzer as ma
+import androfest as ma
 
 console = Console()
 
@@ -61,6 +61,9 @@ def show_item_menu(app, item):
             break
         elif choice == "1":
             show_exported_items(app, item)
+            break
+        elif choice == "2":
+            show_item_attr(app, item)
             break
         else:
             console.print("Invalid Choice. Try Again!", style="bold red")
@@ -136,6 +139,7 @@ def choose_exp_item_for_intent(app, item):
             console.print("Invalid Choice. Try Again!", style="bold red")
         else:
             show_intent_filters(app, list_total_exp_items[int(choice) - 1], item)
+            show_item_menu(app, item)
             break
 #=============== Choose Exported Activity for intent filter Menu End =============== 
 
@@ -237,6 +241,7 @@ def choose_item_for_attributes(app, item):
             console.print("Invalid Choice. Try Again!", style="bold red")
         else:
             show_item_attr(app, list_total_items[int(choice) -1], item)
+            show_item_menu(app, item)
             break
 #=============== Choose Item Attributes Menu End ===============
 
@@ -267,3 +272,12 @@ def show_app_metadata(app):
                 console.print(f"{value}", style=sec_color)
                 count = 0
 #=============== Show App Meta Data End ===============
+
+#=============== Show Manifest Attributres Start ===============
+def show_manifest_attr(root):
+    for attr, value in root.items():
+        if "}" in attr:
+            attr = attr.split('}', 1)[1]
+        print_KeyValue(key=attr, value=value, symbol=diamond_symbol)
+    print('\n')
+#=============== Show Manifest Attributres End ===============
