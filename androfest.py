@@ -8,7 +8,6 @@ import time
 
 version = "1.0.0"
 
-xmlFile = ""
 namespace = "http://schemas.android.com/apk/res/android"
 
 # symbols
@@ -30,7 +29,7 @@ def main():
 
     # Banner
     banner_font = pyfiglet.Figlet(font="slant", width=90)
-    console.print(f"{banner_font.renderText("AndroFest")}", style=pri_color)
+    console.print(f"{banner_font.renderText('AndroFest')}", style=pri_color)
     console.print(f"- By Vivek Sawant, Version: {version}")
 
     # import file from cli 
@@ -78,7 +77,7 @@ def main():
             
     else:
         console.print(f"{x_symbol} Incorrect usage", style="red")
-        console.print(f"{check_symbol} Usage: python manifest_analyzer.py [file name]", style='green', markup=False)
+        console.print(f"{check_symbol} Usage: python androfest.py [file path]", style='green', markup=False)
         return
 
     show_main_menu(app, root)
